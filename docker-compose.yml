@@ -1,0 +1,26 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq/mnesia/rabbit@rabbitmq
+      - rabbitmq-logs:/var/log/rabbitmq/log
+    ports:
+      - 5672:5672
+      - 15672:15672
+      - 15675:15675
+    environment:
+      - RABBITMQ_DEFAULT_USER=gus
+      - RABBITMQ_DEFAULT_PASS=gus
+  worker:
+    build:
+      context: ./
+      dockerfile: ./docker/worker.dockerfile
+    restart: always
+    # deploy:
+    #   replicas: 12
+    depends_on:
+      - rabbitmq
+
+volumes:
+  rabbitmq-data:
+  rabbitmq-logs:
