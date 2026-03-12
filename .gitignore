@@ -212,3 +212,5 @@ uv.lock
 *.xml
 frontend/node_modules/
 frontend/dist/
+backend/.env
+backend/node_modules/
