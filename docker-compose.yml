@@ -14,23 +14,23 @@ services:
 
   backend:
     build:
-      context: ./
+      context: ./backend
       dockerfile: ./docker/backend.dockerfile
     restart: always
     ports:
       - "5020:5020"
     env_file:
-      - .env
+      - backend/.env
     depends_on:
       - rabbitmq
 
   worker:
     build:
-      context: ./
+      context: ./backend
       dockerfile: ./docker/worker.dockerfile
     restart: always
     env_file:
-      - .env
+      - backend/.env
     depends_on:
       - rabbitmq
       - backend
