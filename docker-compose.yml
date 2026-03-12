@@ -11,15 +11,41 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=gus
       - RABBITMQ_DEFAULT_PASS=gus
+
+  backend:
+    build:
+      context: ./
+      dockerfile: ./docker/backend.dockerfile
+    restart: always
+    ports:
+      - "5020:5020"
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+
   worker:
     build:
       context: ./
       dockerfile: ./docker/worker.dockerfile
     restart: always
-    # deploy:
-    #   replicas: 12
+    env_file:
+      - .env
     depends_on:
       - rabbitmq
+      - backend
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://backend:5020
+    restart: always
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
 
 volumes:
   rabbitmq-data:

@@ -5,24 +5,31 @@ from ..domain.graph import (
     ResultadoAnalise,
     ResultadoAvaliacao,
 )
-from ..utils.file import abrir_system_prompt, abrir_txt
+from ..utils.file import abrir_system_prompt
 from langgraph.types import Send
-from langchain.agents import create_agent
-from langchain_openai import ChatOpenAI
-from langfuse.langchain import CallbackHandler
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
 
-
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-llm = ChatOpenAI(model="gpt-5-mini", temperature=0.2)
-langfuse_handler = CallbackHandler()
+llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.2)
+
+# Langfuse é opcional: só ativa se as chaves estiverem configuradas
+_callbacks: list = []
+if os.getenv("LANGFUSE_PUBLIC_KEY") and os.getenv("LANGFUSE_SECRET_KEY"):
+    try:
+        from langfuse.langchain import CallbackHandler
+
+        _callbacks = [CallbackHandler()]
+    except Exception:
+        pass
 
 
 def entrada(state: EstadoGeral):
-    """Entrada do fluxo, também distriu o chat entre diferents workers para avaliar diferentes pontos da conversa"""
+    """Entrada do fluxo, distribui o chat entre diferentes workers para avaliar diferentes pontos da conversa"""
     return [
         Send("avaliar", {"chat": state["chat_avaliado"], "tipo_avaliacao": i})
         for i in [
@@ -45,21 +52,20 @@ def avaliar(state: Avaliacao):
         case _:
             raise Exception("Fora dos padrões")
 
-    agente = create_agent(
-        llm, system_prompt=system_prompt, response_format=ResultadoAnalise
+    structured_llm = llm.with_structured_output(ResultadoAnalise)
+    response: ResultadoAnalise = structured_llm.invoke(
+        [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": state["chat"]},
+        ],
+        config={"callbacks": _callbacks} if _callbacks else {},
     )
-
-    response = agente.invoke(
-        {"messages": [{"role": "user", "content": state["chat"]}]},
-        config={"callbacks": [langfuse_handler]},
-    )
-    response_formated: ResultadoAnalise = response["structured_response"]
 
     return {
         "avaliacoes": [
             {
-                "nota": response_formated.nota,
-                "justificativa": response_formated.justificativa,
+                "nota": response.nota,
+                "justificativa": response.justificativa,
                 "tipo_avaliacao": state["tipo_avaliacao"],
             }
         ]
@@ -77,7 +83,7 @@ def build_grafo():
     Parametros:
         nenhum
     Retorna:
-        Grafo compilado com callbacks configurados
+        Grafo compilado (com callbacks de observabilidade se configurados)
     """
     grafo = StateGraph(EstadoGeral)
 
@@ -91,4 +97,7 @@ def build_grafo():
     grafo.add_edge("avaliar", "retornar_resultado")
     grafo.add_edge("retornar_resultado", END)
 
-    return grafo.compile().with_config({"callbacks": [langfuse_handler]})
+    compiled = grafo.compile()
+    if _callbacks:
+        return compiled.with_config({"callbacks": _callbacks})
+    return compiled
