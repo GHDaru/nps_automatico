@@ -1,17 +1,4 @@
 services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq/mnesia/rabbit@rabbitmq
-      - rabbitmq-logs:/var/log/rabbitmq/log
-    ports:
-      - 5672:5672
-      - 15672:15672
-      - 15675:15675
-    environment:
-      - RABBITMQ_DEFAULT_USER=gus
-      - RABBITMQ_DEFAULT_PASS=gus
-
   backend:
     build:
       context: ./backend
@@ -21,19 +8,6 @@ services:
       - "5020:5020"
     env_file:
       - backend/.env
-    depends_on:
-      - rabbitmq
-
-  worker:
-    build:
-      context: ./backend
-      dockerfile: ./docker/worker.dockerfile
-    restart: always
-    env_file:
-      - backend/.env
-    depends_on:
-      - rabbitmq
-      - backend
 
   frontend:
     build:
@@ -46,7 +20,3 @@ services:
       - "3001:80"
     depends_on:
       - backend
-
-volumes:
-  rabbitmq-data:
-  rabbitmq-logs:

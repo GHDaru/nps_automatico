@@ -1,5 +1,4 @@
-from typing import Iterable, Union
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routes.input_dados import router as input_dados_router
 
