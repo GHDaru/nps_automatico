@@ -211,6 +211,46 @@ O grafo LangGraph avalia cada chat em paralelo em 3 dimensões (0–100 pontos c
 
 ---
 
+## Diagrama de Sequência
+
+O diagrama abaixo descreve o fluxo completo desde a interação do usuário no frontend até a resposta final da API.
+
+```mermaid
+sequenceDiagram
+    actor Usuário
+    participant Frontend as Frontend<br/>(React + Vite)
+    participant API as API<br/>(FastAPI)
+    participant Controller as Controller<br/>(InputDadosController)
+    participant Grafo as Grafo<br/>(LangGraph)
+    participant Gemini as Gemini API<br/>(Google)
+
+    Usuário->>Frontend: Cola o chat e clica "Avaliar Chat"
+    Frontend->>API: POST /chamados/avaliacao_individual<br/>{ "chat": "..." }
+    API->>Controller: processar_chat(chat)
+    Controller->>Grafo: grafo.invoke({ chat_avaliado, avaliacoes: [] })
+
+    Note over Grafo: Nó `entrada` distribui via Send (paralelo)
+
+    par Avaliação paralela
+        Grafo->>Gemini: Comunicação e Clareza<br/>(system_prompt + chat)
+        Gemini-->>Grafo: { nota, justificativa }
+    and
+        Grafo->>Gemini: Profissionalismo e Conformidade<br/>(system_prompt + chat)
+        Gemini-->>Grafo: { nota, justificativa }
+    and
+        Grafo->>Gemini: Resolução e Eficiência<br/>(system_prompt + chat)
+        Gemini-->>Grafo: { nota, justificativa }
+    end
+
+    Grafo-->>Controller: avaliacoes: [ResultadoAvaliacao × 3]
+    Controller->>Controller: Calcular média e mediana
+    Controller-->>API: ResultadoFinal
+    API-->>Frontend: HTTP 200<br/>{ avaliacoes, nota_media, nota_mediana }
+    Frontend-->>Usuário: Exibe resultado das avaliações
+```
+
+---
+
 ## Estrutura do grafo (LangGraph)
 
 ```
