@@ -72,11 +72,6 @@ def avaliar(state: Avaliacao):
     }
 
 
-def retornar_resultado(state: EstadoGeral):
-    """Retorna os resultados da analise"""
-    return {"avaliacoes": state["avaliacoes"]}
-
-
 def build_grafo():
     """
     Monta e compila o grafo de execucao das avaliacoes.
@@ -90,12 +85,10 @@ def build_grafo():
     # Adicionar vertices
     grafo.add_node("entrada", entrada)
     grafo.add_node("avaliar", avaliar)
-    grafo.add_node("retornar_resultado", retornar_resultado)
 
     # Adicionar arestas
     grafo.add_conditional_edges(START, entrada, ["avaliar"])
-    grafo.add_edge("avaliar", "retornar_resultado")
-    grafo.add_edge("retornar_resultado", END)
+    grafo.add_edge("avaliar", END)
 
     compiled = grafo.compile()
     if _callbacks:
