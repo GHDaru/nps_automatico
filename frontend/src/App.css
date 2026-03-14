@@ -10,38 +10,43 @@ body {
   color: #1a202c;
 }
 
-.app {
-  min-height: 100vh;
+/* ── Layout ─────────────────────────────────────────────────── */
+
+.app-layout {
   display: flex;
-  flex-direction: column;
-}
-
-.app-header {
-  background: #2d3748;
-  color: #fff;
-  padding: 1.5rem 2rem;
-  text-align: center;
-}
-
-.app-header h1 {
-  font-size: 1.8rem;
-  margin-bottom: 0.3rem;
-}
-
-.app-header p {
-  color: #a0aec0;
-  font-size: 0.95rem;
+  min-height: 100vh;
 }
 
 .app-main {
-  max-width: 860px;
-  width: 100%;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* ── Page containers ─────────────────────────────────────────── */
+
+.page-content {
+  max-width: 900px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.page-header h2 {
+  font-size: 1.4rem;
+  color: #2d3748;
+}
+
+/* ── Cards ───────────────────────────────────────────────────── */
 
 .form-section,
 .result-section {
@@ -52,11 +57,14 @@ body {
 }
 
 .form-section h2,
+.form-section h3,
 .result-section h2 {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   color: #2d3748;
   margin-bottom: 1.2rem;
 }
+
+/* ── Form elements ───────────────────────────────────────────── */
 
 .eval-form {
   display: flex;
@@ -94,6 +102,28 @@ body {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.field-row--align-center {
+  align-items: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4a5568;
+  cursor: pointer;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+
 .btn-submit {
   background: #667eea;
   color: #fff;
@@ -116,6 +146,77 @@ body {
   cursor: not-allowed;
 }
 
+.btn-upload {
+  background: transparent;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #4a5568;
+  transition: background 0.2s;
+}
+
+.btn-upload:hover {
+  background: #f7fafc;
+}
+
+.btn-download {
+  background: #48bb78;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-download:hover {
+  background: #38a169;
+}
+
+.btn-toggle {
+  background: transparent;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: #4a5568;
+}
+
+.btn-toggle:hover {
+  background: #f7fafc;
+}
+
+.btn-action {
+  background: transparent;
+  border: 1px solid #cbd5e0;
+  border-radius: 5px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #4a5568;
+  transition: background 0.15s;
+}
+
+.btn-action:hover {
+  background: #f7fafc;
+}
+
+.btn-action--danger {
+  color: #c53030;
+  border-color: #feb2b2;
+}
+
+.btn-action--danger:hover {
+  background: #fff5f5;
+}
+
+/* ── Error/feedback ──────────────────────────────────────────── */
+
 .error-section {
   border-left: 4px solid #fc8181;
 }
@@ -131,6 +232,24 @@ body {
   word-break: break-word;
 }
 
+.inline-error {
+  background: #fff5f5;
+  color: #c53030;
+  border: 1px solid #feb2b2;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+
+.loading-text,
+.empty-text {
+  color: #718096;
+  font-size: 0.95rem;
+  padding: 0.5rem 0;
+}
+
+/* ── Result sections ─────────────────────────────────────────── */
+
 .result-header {
   display: flex;
   align-items: center;
@@ -138,18 +257,10 @@ body {
   margin-bottom: 1.2rem;
 }
 
-.btn-toggle {
-  background: transparent;
-  border: 1px solid #cbd5e0;
-  border-radius: 6px;
-  padding: 0.35rem 0.75rem;
-  font-size: 0.85rem;
-  cursor: pointer;
-  color: #4a5568;
-}
-
-.btn-toggle:hover {
-  background: #f7fafc;
+.result-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 .summary-cards {
@@ -223,49 +334,6 @@ body {
   line-height: 1.6;
 }
 
-.field-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.btn-upload {
-  background: transparent;
-  border: 1px solid #cbd5e0;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  color: #4a5568;
-  transition: background 0.2s;
-}
-
-.btn-upload:hover {
-  background: #f7fafc;
-}
-
-.result-actions {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.btn-download {
-  background: #48bb78;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 0.35rem 0.75rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-download:hover {
-  background: #38a169;
-}
-
 .json-box {
   background: #f7fafc;
   border-radius: 6px;
@@ -277,3 +345,77 @@ body {
   color: #2d3748;
   line-height: 1.5;
 }
+
+/* ── Data table ──────────────────────────────────────────────── */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  background: #f7fafc;
+  color: #4a5568;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.data-table td {
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #2d3748;
+  vertical-align: top;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tr:hover td {
+  background: #f7fafc;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.badge {
+  display: inline-block;
+  border: none;
+  border-radius: 12px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.badge:hover {
+  opacity: 0.8;
+}
+
+.badge--green {
+  background: #c6f6d5;
+  color: #276749;
+}
+
+.badge--gray {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.field-name {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.85rem;
+  font-family: monospace;
+  color: #553c9a;
+}
+
