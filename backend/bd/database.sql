@@ -418,3 +418,54 @@ CREATE TRIGGER avaliacoes_atualizado_em
 BEFORE UPDATE ON avaliacoes
 FOR EACH ROW
 EXECUTE FUNCTION atualiza_atualizado_em();
+
+-- ============================================================
+--  TABLE: prompts
+--  Armazena os prompts de avaliação gerenciados pelo administrador.
+--  Cada prompt representa uma dimensão de análise (ex: Comunicação e Clareza).
+-- ============================================================
+CREATE TABLE IF NOT EXISTS prompts (
+    id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    -- Nome da dimensão de análise (ex: "Comunicação e Clareza")
+    nome          TEXT        NOT NULL,
+
+    -- Conteúdo completo do prompt (instruções para o LLM)
+    conteudo      TEXT        NOT NULL,
+
+    -- Indica se o prompt está ativo para o fluxo de avaliação
+    ativo         BOOLEAN     NOT NULL DEFAULT true,
+
+    criado_em     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_prompts_ativo ON prompts(ativo);
+
+CREATE TRIGGER prompts_atualizado_em
+BEFORE UPDATE ON prompts
+FOR EACH ROW
+EXECUTE FUNCTION atualiza_atualizado_em();
+
+-- ============================================================
+--  TABLE: campos_extraidos
+--  Armazena os campos globais que devem ser extraídos das mensagens/chats.
+--  Exemplos: cliente, atendente, categoria do chamado.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS campos_extraidos (
+    id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    -- Nome do campo (ex: "cliente", "atendente", "categoria_chamado")
+    nome          TEXT        NOT NULL UNIQUE,
+
+    -- Descrição do campo para ser exportada no JSON
+    descricao     TEXT        NOT NULL,
+
+    criado_em     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TRIGGER campos_extraidos_atualizado_em
+BEFORE UPDATE ON campos_extraidos
+FOR EACH ROW
+EXECUTE FUNCTION atualiza_atualizado_em();

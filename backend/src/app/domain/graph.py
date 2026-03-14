@@ -11,7 +11,7 @@ class TipoAvaliacao(str, Enum):
 
 
 class ResultadoAnalise(BaseModel):
-    nota: int = Field(description="Nota baseada em evidências do chat", ge=0, le=100)
+    nota: int = Field(description="Nota baseada em evidências do chat", ge=0, le=10)
     justificativa: str = Field(
         description="Justificativa detalhada baseada em evidências do chat referenciando trechos da conversa"
     )

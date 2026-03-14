@@ -11,6 +11,14 @@ export default defineConfig({
         target: 'http://localhost:5020',
         changeOrigin: true,
       },
+      '/prompts': {
+        target: 'http://localhost:5020',
+        changeOrigin: true,
+      },
+      '/campos': {
+        target: 'http://localhost:5020',
+        changeOrigin: true,
+      },
     },
   },
 })
