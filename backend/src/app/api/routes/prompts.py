@@ -80,7 +80,11 @@ def obter_prompt(prompt_id: UUID):
 @router.put("/{prompt_id}", response_model=PromptResponse)
 def atualizar_prompt(prompt_id: UUID, body: PromptUpdate):
     """Atualiza um prompt existente (apenas os campos fornecidos)."""
-    updates = {k: v for k, v in body.model_dump().items() if v is not None}
+    _ALLOWED_COLS = {"nome", "conteudo", "ativo"}
+    updates = {
+        k: v for k, v in body.model_dump().items()
+        if v is not None and k in _ALLOWED_COLS
+    }
     if not updates:
         raise HTTPException(status_code=422, detail="Nenhum campo para atualizar")
 

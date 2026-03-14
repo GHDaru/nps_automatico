@@ -54,7 +54,8 @@ def criar_campo(body: CampoCreate):
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
     except Exception as exc:
-        if "unique" in str(exc).lower():
+        # psycopg2 error code 23505 = unique_violation
+        if getattr(exc, "pgcode", None) == "23505":
             raise HTTPException(
                 status_code=409, detail=f"Já existe um campo com o nome '{body.nome}'"
             )
@@ -85,7 +86,11 @@ def obter_campo(campo_id: UUID):
 @router.put("/{campo_id}", response_model=CampoResponse)
 def atualizar_campo(campo_id: UUID, body: CampoUpdate):
     """Atualiza um campo extraído existente (apenas os campos fornecidos)."""
-    updates = {k: v for k, v in body.model_dump().items() if v is not None}
+    _ALLOWED_COLS = {"nome", "descricao"}
+    updates = {
+        k: v for k, v in body.model_dump().items()
+        if v is not None and k in _ALLOWED_COLS
+    }
     if not updates:
         raise HTTPException(status_code=422, detail="Nenhum campo para atualizar")
 
@@ -108,7 +113,8 @@ def atualizar_campo(campo_id: UUID, body: CampoUpdate):
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
     except Exception as exc:
-        if "unique" in str(exc).lower():
+        # psycopg2 error code 23505 = unique_violation
+        if getattr(exc, "pgcode", None) == "23505":
             raise HTTPException(
                 status_code=409,
                 detail=f"Já existe um campo com o nome '{updates.get('nome')}'",
