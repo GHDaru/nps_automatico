@@ -72,6 +72,47 @@ def avaliar(state: Avaliacao):
     }
 
 
+def avaliar_com_instrucoes(
+    chat: str,
+    tipo_avaliacao: TipoAvaliacao,
+    instrucoes_personalizadas: str | None = None,
+) -> ResultadoAvaliacao:
+    """Avalia o chat para um tipo de avaliação, injetando instruções personalizadas se fornecidas."""
+    match tipo_avaliacao:
+        case TipoAvaliacao.ComunicacaoClareza:
+            system_prompt = abrir_system_prompt("Comunicação e Clareza")
+        case TipoAvaliacao.ProfissionalismoConformidade:
+            system_prompt = abrir_system_prompt("Profissionalismo e Conformidade")
+        case TipoAvaliacao.ResolucaoEficiencia:
+            system_prompt = abrir_system_prompt("Resolução e Eficiência")
+        case _:
+            raise Exception("Fora dos padrões")
+
+    if instrucoes_personalizadas:
+        system_prompt = (
+            system_prompt
+            + "\n\n## Instruções Personalizadas\n\n"
+            + "IMPORTANTE: As instruções a seguir são fornecidas pelo cliente e devem ser consideradas "
+            + "com maior prioridade do que os demais critérios acima.\n\n"
+            + instrucoes_personalizadas
+        )
+
+    structured_llm = llm.with_structured_output(ResultadoAnalise)
+    response: ResultadoAnalise = structured_llm.invoke(
+        [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": chat},
+        ],
+        config={"callbacks": _callbacks} if _callbacks else {},
+    )
+
+    return {
+        "nota": response.nota,
+        "justificativa": response.justificativa,
+        "tipo_avaliacao": tipo_avaliacao,
+    }
+
+
 def build_grafo():
     """
     Monta e compila o grafo de execucao das avaliacoes.

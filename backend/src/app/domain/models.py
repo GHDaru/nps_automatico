@@ -1,11 +1,36 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from .graph import ResultadoAvaliacao
+from .graph import ResultadoAvaliacao, TipoAvaliacao  # noqa: F401 – re-exported
 
 
 class EntradaAvaliacaoSingular(BaseModel):
     chat: str = Field(
         description="Campo onde deve ficar o chat/chamado por completo e organizado de cima para baixo em ordem crescente em relação ao timestamp do momento em que a mensagem foi enviada, e organiar também por ATENDENTE e CLIENTE por fins de organização e dar a nomeclatura correta para um dos atores participantes do chat/chamado"
+    )
+
+
+class DimensoesPersonalizadas(BaseModel):
+    comunicacao: str | None = Field(
+        default=None,
+        description="Instruções personalizadas para a dimensão Comunicação e Clareza",
+    )
+    profissionalismo: str | None = Field(
+        default=None,
+        description="Instruções personalizadas para a dimensão Profissionalismo e Conformidade",
+    )
+    resolucao: str | None = Field(
+        default=None,
+        description="Instruções personalizadas para a dimensão Resolução e Eficiência",
+    )
+
+
+class EntradaAvaliacaoPersonalizada(BaseModel):
+    chat: str = Field(
+        description="Campo onde deve ficar o chat/chamado por completo e organizado de cima para baixo em ordem crescente em relação ao timestamp"
+    )
+    dimensoes: DimensoesPersonalizadas = Field(
+        default_factory=DimensoesPersonalizadas,
+        description="Instruções personalizadas para cada dimensão de avaliação",
     )
 
 

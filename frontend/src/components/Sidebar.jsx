@@ -3,6 +3,7 @@ import './Sidebar.css'
 
 const navItems = [
   { to: '/', label: '📊 Avaliação', end: true },
+  { to: '/avaliacao-personalizada', label: '🎯 Avaliação Personalizada' },
   { to: '/prompts', label: '📝 Prompts' },
   { to: '/campos', label: '🗂️ Campos Extraídos' },
 ]
