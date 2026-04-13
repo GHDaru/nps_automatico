@@ -34,6 +34,9 @@ export default function Avaliacao() {
   const [resultado, setResultado] = useState(null)
   const [error, setError] = useState(null)
   const [rawJson, setRawJson] = useState(false)
+  const [loadingMetadados, setLoadingMetadados] = useState(false)
+  const [metadados, setMetadados] = useState(null)
+  const [errorMetadados, setErrorMetadados] = useState(null)
   const fileInputRef = useRef(null)
 
   function handleFileChange(e) {
@@ -70,6 +73,33 @@ export default function Avaliacao() {
       setError(`Erro ao conectar com a API: ${err.message}`)
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleExtrairMetadados() {
+    if (!chat.trim()) return
+    setLoadingMetadados(true)
+    setMetadados(null)
+    setErrorMetadados(null)
+
+    try {
+      const response = await fetch(`${API_BASE}/chamados/extrair_metadados`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ atendimento: chat }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setErrorMetadados(data.detail || JSON.stringify(data, null, 2))
+      } else {
+        setMetadados(data)
+      }
+    } catch (err) {
+      setErrorMetadados(`Erro ao conectar com a API: ${err.message}`)
+    } finally {
+      setLoadingMetadados(false)
     }
   }
 
@@ -122,6 +152,14 @@ export default function Avaliacao() {
           <button type="submit" disabled={loading} className="btn-submit">
             {loading ? 'Avaliando...' : 'Avaliar Chat'}
           </button>
+          <button
+            type="button"
+            disabled={loadingMetadados || !chat.trim()}
+            className="btn-submit"
+            onClick={handleExtrairMetadados}
+          >
+            {loadingMetadados ? 'Extraindo...' : 'Extrair Metadados'}
+          </button>
         </form>
       </section>
 
@@ -172,6 +210,33 @@ export default function Avaliacao() {
               </div>
             </>
           )}
+        </section>
+      )}
+
+      {errorMetadados && (
+        <section className="result-section error-section">
+          <h2>Erro ao Extrair Metadados</h2>
+          <pre className="error-box">{errorMetadados}</pre>
+        </section>
+      )}
+
+      {metadados && (
+        <section className="result-section">
+          <h2>Metadados Extraídos</h2>
+          <div className="score-card">
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <tbody>
+                {Object.entries(metadados).map(([key, value]) => (
+                  <tr key={key} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                    <td style={{ padding: '8px 12px', fontWeight: 600, whiteSpace: 'nowrap', width: '40%' }}>
+                      {key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                    </td>
+                    <td style={{ padding: '8px 12px' }}>{value || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
     </div>

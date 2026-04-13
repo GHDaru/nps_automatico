@@ -48,6 +48,19 @@ class PromptResponse(BaseModel):
 
 # ── Campo Extraído models ──────────────────────────────────────────────────────
 
+class EntradaExtrairMetadados(BaseModel):
+    atendimento: str = Field(description="Texto completo do atendimento do qual serão extraídos os metadados")
+
+
+class MetadadosAtendimento(BaseModel):
+    numero_atendimento: str = Field(description="Número/identificador do atendimento")
+    nome_cliente: str = Field(description="Nome do cliente")
+    contato_cliente: str = Field(description="E-mail ou telefone de contato do cliente")
+    atendente_principal: str = Field(description="Nome do atendente principal responsável")
+    data_hora_atendimento: str = Field(description="Data e hora do atendimento no formato dd/mm/aaaa hh:mm")
+    metadados_adicionais: str = Field(description="Outras informações relevantes encontradas no atendimento")
+
+
 class CampoCreate(BaseModel):
     nome: str = Field(description="Nome do campo a ser extraído (ex: cliente, atendente)")
     descricao: str = Field(description="Descrição do campo para ser exportada no JSON")
